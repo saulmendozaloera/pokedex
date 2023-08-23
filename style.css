@@ -1,17 +1,19 @@
+html, body {
+  background: linear-gradient(white, #d00000);
+}
+
 #searchBar{
   width: 300px;
   margin-left: auto;
-  margin-right: auto
-}
-
-html, body {
-  height: 110%;
-  width: 100%;
-  background-image: linear-gradient(#c6c6c6, #ffffff);
+  margin-right: auto;
 }
 
 #pokemonName, #pokemonType, #pokemonHeight, #pokemonWeight{
   height: 30px;
+}
+
+.logo{
+  font-family: 'VT323', monospace;
 }
 
 h1{
@@ -23,6 +25,7 @@ h1{
  font-family: 'VT323', monospace;
  height: 35px; 
 }
+
 #firstRow{
   font-family: 'VT323', monospace;
   font-size: 18px;
@@ -30,6 +33,7 @@ h1{
   height: 190px;
   padding: 5px 5px 5px 5px;
 }
+
 #secondRow{
   font-family: 'VT323', monospace;
   font-size: 18px;
@@ -60,7 +64,45 @@ h1{
   border:solid red;
   border-radius: 5px;
   box-shadow: 0px 0px 10px white, 0px 0px 15px #f25c43;
-  background-color: white;
   max-width: 400px;
   height: 500px;
+  background: white;
 }
+
+#welcome-toast{
+  position: absolute;
+  top: 5%;
+  right: 1%;
+}
+
+#instruction-toast{
+  position: absolute;
+  top: 20%;
+  right: 1%;
+}
+
+@media screen and (max-width: 400px){
+  #welcome-toast{
+    position: absolute;
+    top: 10%;
+    right: 2%;
+    width: 250px;
+  }
+
+  #instruction-toast{
+    position: absolute;
+    top: 30%;
+    right: 2%;
+    width: 250px;
+  }
+  
+  #displayPokemon{
+  border:solid red;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px white, 0px 0px 15px #f25c43;
+  max-width: 300px;
+  height: 500px;
+  background: white;
+  }
+}
+
