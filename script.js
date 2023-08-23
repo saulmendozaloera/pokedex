@@ -1,23 +1,106 @@
-//event listeners
+/*
+ * Event listener initializes image to ?
+ */
 document.querySelector("#pokemonImage").innerHTML = "<h1>?</h1>";
+/*
+ * Event listener calles the validateForm once user clicks button. 
+ */
 document.querySelector("#searchPokemon").addEventListener("click", function(event){
   validateForm(event);
 });
 
+/* Event listener that populates pokemon options when user
+ * enters letters.
+ */
+document.addEventListener("DOMContentLoaded", function() {
+    const datalist = document.getElementById("pokemonOptions");
+    const inputField = document.getElementById("pokemon");
+    inputField.addEventListener("input", async function() {
+      const inputText = inputField.value.trim().toLowerCase();
+      if (inputText.length >= 1) {
+          datalist.innerHTML = ""; 
 
-//functions
+          const url = `https://pokeapi.co/api/v2/pokemon/?limit=1118`;
+          const response = await fetch(url);
+          const data = await response.json();
+          const filteredPokemon = data.results.filter(pokemon => pokemon.name.startsWith(inputText));
+
+          filteredPokemon.forEach(async pokemon => {
+              const pokemonData = await fetchPokemonData(pokemon.name);
+              const option = document.createElement("option");
+              option.value = pokemon.name;
+              option.innerHTML = `<img src="${pokemonData.sprites.front_default}" alt="${pokemon.name}" style="width: 5px; height: 5px;"> <i class="bi bi-0-circle"></i> ${pokemon.name}`;
+              datalist.appendChild(option);
+          });
+      }
+    });
+});
+
+/*
+ * Event listener for when user wants to view the evolve to Pokémon.  
+ */
+document.getElementById("evolveTo").addEventListener("click", async function() {
+    resetPokedex();
+  
+    const pokemonName = document.getElementById("evolveTo").getAttribute("data-name");
+    let data = await fetchPokemonData(pokemonName);
+   
+    displayFirstRow(data);
+    displayMiddleRow(data);
+    displayRowThree(data);
+});
+
+/*
+ * Event listener for when user wants to view the evolve from Pokémon.  
+ */
+document.getElementById("evolveFrom").addEventListener("click", async function() {
+    resetPokedex();
+    const pokemonName = document.getElementById("evolveFrom").getAttribute("data-name");
+    let data = await fetchPokemonData(pokemonName);
+    displayFirstRow(data);
+    displayMiddleRow(data);
+    displayRowThree(data);
+});
+
+/*
+ *Event Listener for when the user hits the enter/return key.
+ */
+document.getElementById("search").addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    // Prevent the default "Enter" behavior
+    event.preventDefault(); 
+    document.getElementById("searchPokemon").click();
+  }
+});
+
+/*
+ *Eventlistener for the Toast Messages
+ */
+document.addEventListener("DOMContentLoaded", function() {
+  // Show the toast when the page is loaded
+  var toastElement = document.querySelector('#welcome-toast');
+  var toast = new bootstrap.Toast(toastElement);
+  toast.show();
+
+  var toastElement = document.querySelector('#instruction-toast');
+  var toast = new bootstrap.Toast(toastElement);
+  toast.show();
+});
+
+/*
+ *Validates if the data entered is a valid Pokémon name or ID. 
+ */
 async function validateForm(e){
 
   let isValid = true;
   
   resetPokedex();
-  let pokemon = document.querySelector("#pokemon").value.toLowerCase();
-  let url =`https://pokeapi.co/api/v2/pokemon/${pokemon}`;
-  let response = await fetch(url);
+  let pokemonName = document.querySelector("#pokemon").value.toLowerCase();
   
-  if(pokemon === ""|| response.ok === false ){
+  
+  if(pokemon === ""){
     document.querySelector("#error").innerHTML = "Please enter a valid name or ID";
-    document.querySelector("#error").style.color = "red";
+    document.querySelector("#error").style.color = "white";
     isValid = false;
   }
 
@@ -26,24 +109,28 @@ async function validateForm(e){
   }
     
   else{
-    let data = await response.json();
+    let data = await fetchPokemonData(pokemonName);
     displayFirstRow(data);
     displayMiddleRow(data);
     displayRowThree(data);
   }
 }
-
-async function pokemonImage(pokemon, ID){
+/*
+ * Displays images of Pokémon. 
+ */
+async function pokemonImage(pokemonName, ID){
   
-  let url =`https://pokeapi.co/api/v2/pokemon/${pokemon}`;
-  let response = await fetch(url);
-  let data = await response.json();
+  let data = await fetchPokemonData(pokemonName);
 
   let pic = data.sprites.front_default;
 
   document.querySelector(`#${ID}`).innerHTML = `<img src="${pic}" alt="${pokemon}"></img>`;
+  document.querySelector(`#${ID}`).setAttribute("data-name", data.species.name);
 }
 
+/*
+ * Fetches evolutions prior or future for the current Pokémon. 
+ */
 async function evolutionChain(pokemon){
   
   let url =`https://pokeapi.co/api/v2/pokemon-species/${pokemon}/`;
@@ -100,6 +187,10 @@ async function evolutionChain(pokemon){
   }
 }
 
+/*
+ * Displays first row of the Pokédex.  
+ */
+
 function displayFirstRow(data){
   
   pokemonImage(data.species.name, "pokemonImage");
@@ -111,7 +202,9 @@ function displayFirstRow(data){
     
   }
 }
-
+/*
+ * Displays second row of the Pokédex
+ */
 async function displayMiddleRow(data){
   
   document.querySelector("#pokemonHeight").innerHTML += `${data.height} ft`;
@@ -121,7 +214,9 @@ async function displayMiddleRow(data){
 
   
 }
-
+/*
+ * Displays last row of the Pokédex. 
+ */
 function displayRowThree(data){
 
   for(let i=0; i < data.abilities.length; i++){
@@ -138,6 +233,9 @@ function displayRowThree(data){
 }
 
 
+/*
+ *Resets the Pokedex.
+ */
 function resetPokedex(){
 
   document.querySelector("#pokemonImage").innerHTML = "<h1>?</h1>";
@@ -157,3 +255,13 @@ function resetPokedex(){
   document.querySelector("#error").innerHTML = "";
  
 }
+/*
+ * Function that obtains Pokémon data. 
+ */
+async function fetchPokemonData(pokemonName) {
+  const url = `https://pokeapi.co/api/v2/pokemon/${pokemonName}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+}
+
